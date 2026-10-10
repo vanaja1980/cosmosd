@@ -1,0 +1,5 @@
+@baseUrl = http://localhost:5018
+
+### Get products from Cosmos DB
+GET {{baseUrl}}/api/products
+Accept: application/json
