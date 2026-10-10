@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddScoped<GetProductsHandler>();
-builder.Services.AddRedisProductCaching(builder.Configuration, builder.Environment);
+builder.Services.AddRedisProductCaching(builder.Configuration);
 builder.Services.AddCosmosInfrastructure(builder.Configuration);
 builder.Services
     .AddGraphQLServer()

@@ -28,17 +28,22 @@ defaults to database `store` and container `products`, and creates them automati
 with `/category` as the partition key. Override the names in configuration if you want different
 names.
 
-The product list is cached for one minute. Development uses .NET's in-memory distributed cache, so
-you do not need Docker or a Redis server to run locally. This cache is process-local and is cleared
-when the app stops.
+The product list is cached in Redis for one minute in all environments. Development uses the
+`localhost:6379` connection string from `appsettings.Development.json`.
 
-Non-Development environments use Redis. Configure `Redis:ConnectionString` or set
-`Redis__ConnectionString` to your Redis server's connection string. Keep secured connection strings
-outside source control. Redis must be available when product queries are made; cache errors are
-surfaced rather than silently ignored.
+Install and start Docker Desktop, then run this from the project directory to start Redis:
 
-The cache is read-through: the first product-list request loads Cosmos DB and stores the list in the
-configured cache; subsequent requests use that value until its one-minute absolute expiry. As this
+```powershell
+docker compose up -d redis
+```
+
+Stop Redis when finished with `docker compose down`. Configure `Redis:ConnectionString` or set
+`Redis__ConnectionString` to use a different Redis server. Keep secured connection strings outside
+source control. Redis must be available before starting the app; cache errors are surfaced rather
+than silently ignored.
+
+The cache is read-through: the first product-list request loads Cosmos DB and stores the list in
+Redis; subsequent requests use that value until its one-minute absolute expiry. As this
 app only reads products, no write-side invalidation is needed yet. When product mutations are added,
 they should invalidate this cache key after successful writes.
 
@@ -48,7 +53,7 @@ Set the Cosmos endpoint and key as environment variables before starting the app
 | --- | --- |
 | `CosmosDb__Endpoint` | Cosmos DB account endpoint |
 | `CosmosDb__Key` | Cosmos DB account key |
-| `Redis__ConnectionString` | Required outside Development; Redis server connection string |
+| `Redis__ConnectionString` | Optional override for the Redis connection string (`localhost:6379` in Development) |
 
 For local development without Azure, run the Azure Cosmos DB Emulator. Keep the key out of source
 control; use .NET User Secrets. This project already has a `UserSecretsId`, so do not run

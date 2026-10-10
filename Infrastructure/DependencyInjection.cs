@@ -3,7 +3,6 @@ using Grapgql.Infrastructure.Caching;
 using Grapgql.Infrastructure.Persistence.Cosmos;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -14,15 +13,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddRedisProductCaching(
         this IServiceCollection services,
-        IConfiguration configuration,
-        IHostEnvironment environment)
+        IConfiguration configuration)
     {
-        if (environment.IsDevelopment())
-        {
-            services.AddDistributedMemoryCache();
-            return services;
-        }
-
         var connectionString = configuration["Redis:ConnectionString"];
         if (string.IsNullOrWhiteSpace(connectionString))
         {
